@@ -58,9 +58,3 @@ correlation_dict = (correlation_strength(df, 'Life_Expectancy', 'GDP'))   #   A 
 life_expectancy_mean = df.groupby('Country', as_index=False).Life_Expectancy.mean()
 life_expectancy_mean.sort_values(by = 'Life_Expectancy', ascending = False, inplace=True, ignore_index = True)
 #print(life_expectancy_mean) #   Germany has the highest mean life expectancy and Zimbabwe has the lowest.
- 
-
-
-
-
-
