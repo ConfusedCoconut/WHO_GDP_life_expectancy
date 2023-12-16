@@ -1,0 +1,66 @@
+import matplotlib.pyplot as plt
+import numpy as numpy
+import pandas as pd
+import seaborn as sns
+from scipy.stats import pearsonr
+
+df = pd.read_csv('all_data.csv')
+print(df.head())
+#df.info()
+
+df.rename(columns = {'Life expectancy at birth (years)': 'Life_Expectancy'}, inplace = True)
+def plots(df):
+    for country in df.Country.unique():
+        temporary_set = df[df.Country == country]
+        plt.figure(figsize = [10, 8])
+        sns.barplot(x = temporary_set.Year, y = temporary_set.GDP, hue = temporary_set.Life_Expectancy)
+        plt.title(f"GDP Per Year in {country}")
+        #plt.savefig(f"Plots/GDP_Life_Expectancy_per_year/{country}")
+        #plt.show()
+        plt.close()
+
+        plt.figure(figsize = [10, 8])
+        sns.scatterplot(x = temporary_set.Life_Expectancy, y = temporary_set.GDP)
+        plt.title(f"GDP Vs. Life Expectancy in {country}")
+        #plt.savefig(f"Plots/GDP_Vs_Life_Expectancy/{country}")
+        #plt.show()
+        plt.close()
+
+
+plots(df)   #   All countries had an upwards trend in GDP per year except for Zimbabwe. There was a downtrend until 2008.
+            #   There seems to be a correlation between life expectancy and GDP. Let's look into this further.
+
+sns.scatterplot(data = df, x = 'Life_Expectancy', y = 'GDP', hue = 'Country')
+#plt.show()  #   Plotting the relation between the GDP and life expectancy for all countries at once does not show much since the USA skews the GDP values.
+plt.close()
+
+graph = sns.FacetGrid(df, col="Country", col_wrap=3,
+                      hue = "Country", sharey = False, sharex = False)
+graph = (graph.map(sns.scatterplot,"Life_Expectancy", "GDP")
+         .add_legend()
+         .set_axis_labels("Life expectancy at birth (years)", "GDP in Trillions of U.S. Dollars"))
+#plt.show()
+#plt.savefig(f"Plots/GDP_Vs_Life_Expectancy")
+
+def correlation_strength(df, variable1, variable2):
+    correlation_dict = {}
+    for country in df.Country.unique():
+        temporary_set = df[df.Country == country]
+        correlation, p = pearsonr(temporary_set[variable1], temporary_set[variable2])
+        correlation_dict[country] = correlation
+    
+    return correlation_dict
+
+correlation_dict = (correlation_strength(df, 'Life_Expectancy', 'GDP'))   #   A strong correlation can be seen in each country.
+#print(correlation_dict)
+
+
+life_expectancy_mean = df.groupby('Country', as_index=False).Life_Expectancy.mean()
+life_expectancy_mean.sort_values(by = 'Life_Expectancy', ascending = False, inplace=True, ignore_index = True)
+#print(life_expectancy_mean) #   Germany has the highest mean life expectancy and Zimbabwe has the lowest.
+ 
+
+
+
+
+
